@@ -1,0 +1,34 @@
+version: 2.1
+
+executors:
+  ubuntu-focal:
+    working_directory: /
+    docker:
+      - image: atotto/mutter:ubuntu-focal
+
+commands:
+  deploy-packagecloud:
+    steps:
+      - run:
+          name: setup atotto packagecloud
+          command: |
+            apt update && apt install -y curl
+            curl -s https://packagecloud.io/install/repositories/atotto/debian-utils/script.deb.sh | os=any dist=any bash
+            apt install -y packagecloud
+      - run:
+          name: deploy packagecloud
+          command: |
+            packagecloud push atotto/mutter/ubuntu/focal /libmutter-*.deb
+
+jobs:
+  deploy:
+    executor:
+      name: ubuntu-focal
+    steps:
+      - deploy-packagecloud
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - deploy
