@@ -1,13 +1,15 @@
 version: 2.1
 
-executors:
-  ubuntu-focal:
+jobs:
+  deploy:
+    parameters:
+      distro:
+        type: string
+      version:
+        type: string
     working_directory: /
     docker:
-      - image: atotto/mutter:ubuntu-focal
-
-commands:
-  deploy-packagecloud:
+      - image: atotto/mutter:<< parameters.distro >>-<< parameters.version >>
     steps:
       - run:
           name: setup atotto packagecloud
@@ -18,17 +20,12 @@ commands:
       - run:
           name: deploy packagecloud
           command: |
-            packagecloud push atotto/mutter/ubuntu/focal /libmutter-*.deb
-
-jobs:
-  deploy:
-    executor:
-      name: ubuntu-focal
-    steps:
-      - deploy-packagecloud
+            packagecloud push atotto/mutter/<< parameters.distro >>/<< parameters.version >> /libmutter-*.deb
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - deploy
+      - deploy:
+          distro: ubuntu
+          version: focal
