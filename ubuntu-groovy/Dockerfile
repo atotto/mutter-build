@@ -14,5 +14,5 @@ RUN cd build/mutter-* && \
     dpkg-buildpackage -rfakeroot -uc -b
 
 FROM ubuntu:groovy
-COPY --from=builder /build/libmutter-* /
+COPY --from=builder /build /build
 

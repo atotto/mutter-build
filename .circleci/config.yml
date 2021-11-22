@@ -20,7 +20,7 @@ jobs:
       - run:
           name: deploy packagecloud
           command: |
-            packagecloud push atotto/mutter/<< parameters.distro >>/<< parameters.version >> /libmutter-*.deb
+            packagecloud push atotto/mutter/<< parameters.distro >>/<< parameters.version >> /build/*.deb
 
 workflows:
   version: 2
