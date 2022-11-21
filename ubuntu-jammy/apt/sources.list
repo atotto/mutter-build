@@ -1,0 +1,4 @@
+deb http://archive.ubuntu.com/ubuntu/ jammy main universe
+deb http://archive.ubuntu.com/ubuntu/ jammy-updates main universe
+deb-src http://archive.ubuntu.com/ubuntu/ jammy-updates main universe
+

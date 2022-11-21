@@ -28,6 +28,9 @@ workflows:
     jobs:
       - deploy:
           distro: ubuntu
+          version: jammy
+      - deploy:
+          distro: ubuntu
           version: focal
       - deploy:
           distro: ubuntu
