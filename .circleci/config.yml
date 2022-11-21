@@ -9,18 +9,38 @@ jobs:
         type: string
     working_directory: /
     docker:
-      - image: atotto/mutter:<< parameters.distro >>-<< parameters.version >>
+      - image: << parameters.distro >>:<< parameters.version >>
     steps:
       - run:
-          name: setup atotto packagecloud
+          name: setup atotto packagecloud client
           command: |
             apt update && apt install -y curl
             curl -s https://packagecloud.io/install/repositories/atotto/debian-utils/script.deb.sh | os=any dist=any bash
             apt install -y packagecloud
       - run:
-          name: deploy packagecloud
+          name: setup deb-src
           command: |
-            packagecloud push atotto/mutter/<< parameters.distro >>/<< parameters.version >> /build/*.deb
+            sed -i 's|# deb-src|deb-src|g' /etc/apt/sources.list
+      - run:
+          name: build mutter package
+          command: |
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get build-dep -y mutter
+            apt-get install -y devscripts
+            mkdir /build && cd /build
+            apt-get source mutter
+            
+            export DEBEMAIL=example@example.com
+            cd /build/mutter-*
+            sed -i 's|case XkbNewKeyboardNotify:|//case XkbNewKeyboardNotify:|' ./src/backends/x11/meta-backend-x11.c
+            dch --local + "Workaround https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/1858"
+            dch --release ""
+            DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -rfakeroot -uc -b
+      - run:
+          name: deploy to packagecloud
+          command: |
+            packagecloud push atotto/mutter/<< parameters.distro >>/<< parameters.version >> /build/libmutter-*.deb
 
 workflows:
   version: 2
@@ -29,9 +49,3 @@ workflows:
       - deploy:
           distro: ubuntu
           version: jammy
-      - deploy:
-          distro: ubuntu
-          version: focal
-      - deploy:
-          distro: ubuntu
-          version: groovy
