@@ -49,3 +49,6 @@ workflows:
       - deploy:
           distro: ubuntu
           version: jammy
+      - deploy:
+          distro: ubuntu
+          version: noble
